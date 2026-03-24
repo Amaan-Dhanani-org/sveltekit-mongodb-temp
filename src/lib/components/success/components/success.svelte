@@ -2,6 +2,7 @@
 	import RoundSuccess from '~icons/ic/baseline-check-circle';
 	import type { Props } from '..';
 	import { cn } from '$lib/utils';
+	import { Frame, Flex } from 'sk-clib';
 	import { fade } from 'svelte/transition'; // Added for smooth "fade"
 
 	let { 
@@ -36,12 +37,12 @@
 	<!-- transition:fade makes it disappear smoothly -->
 	<div transition:fade={{ duration: 500 }}>
 		{#if big}
-			<div class={divCls}>
-				<div class="w-full mx-auto max-w-[290px] overflow-hidden rounded-lg bg-white shadow-lg">
-					<div class="p-5 text-center">
-						<div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-teal-100">
+			<Frame class={divCls}>
+				<Frame class="w-full mx-auto max-w-[290px] overflow-hidden rounded-lg bg-white shadow-lg">
+					<Frame class="p-5 text-center">
+						<Frame class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-teal-100">
 							<RoundSuccess class="h-6 w-6 text-teal-600" />
-						</div>
+						</Frame>
 						<h3 class="mt-3 text-base font-semibold text-gray-900">Yay, you did it!</h3>
 						<p class="mt-2 text-sm text-gray-500">{success}</p>
 						{#if btnText}
@@ -49,14 +50,14 @@
 								{btnText}
 							</button>
 						{/if}
-					</div>
-				</div>
-			</div>
+					</Frame>
+				</Frame>
+			</Frame>
 		{:else}
-			<div class="relative flex items-center gap-2 rounded-lg border border-teal-400 bg-teal-100 px-2 py-1 text-[12px] text-teal-700">
+			<Flex center class="relative gap-2 rounded-lg border border-teal-400 bg-teal-100 px-2 py-1 text-[12px] text-teal-700">
 				<RoundSuccess class="inline h-[16px] w-[16px]" />
 				{success}
-			</div>
+			</Flex>
 		{/if}
 	</div>
 {/if}

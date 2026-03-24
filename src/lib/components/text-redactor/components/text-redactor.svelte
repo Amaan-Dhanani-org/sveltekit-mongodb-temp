@@ -3,9 +3,9 @@
 
 	let {
 		text = $bindable(''),
-		number = $bindable(4),       
-		char = $bindable('*'),                 
-		...rest                         
+		number = $bindable(4),
+		char = $bindable('*'),
+		...rest
 	}: Props = $props();
 
 	let redacted = $state('');

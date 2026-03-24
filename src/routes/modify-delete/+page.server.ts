@@ -13,7 +13,7 @@ export const load: PageServerLoad = async () => {
 }
 
 export const actions = {
-    modifyDelete: async (event) => {
+    modifyDelete: async (event: any) => {
         const form = await superValidate(event, zod4(modifyDeleteSchema));
 
         if (!form.valid) {
@@ -32,7 +32,7 @@ export const actions = {
         return { form };
     },
 
-    code: async (event) => {
+    code: async (event: any) => {
         const code = (await event.request.formData()).get("code") as string;
         const { error, go_back_btn } = await verify_request(code, event.cookies);
 
@@ -40,7 +40,7 @@ export const actions = {
             return { error, go_back_btn };
         }
 
-        throw redirect(303, "/login");
+        throw redirect(307, "/login");
     }
 
 

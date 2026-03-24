@@ -1,9 +1,10 @@
 <script lang="ts">
-	import { Error, Input, CodeInput, Dropdown } from '$lib/components';
+	import { Error, Input, CodeInput, Dropdown, LightDark } from '$lib/components';
 	import { Flex, Frame, Button, Header, Text } from 'sk-clib';
 	import Logo from '$lib/images/Logo.png';
 	import { enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
+	import Back from '~icons/mdi/arrow-back';
 
 	import { superForm } from 'sveltekit-superforms/client';
 	import type { PageData, ActionData } from './$types';
@@ -33,17 +34,22 @@
 	});
 </script>
 
-<Flex col fill class="mt-20">
-	<Header bold class="ml-4 !text-3xl sm:ml-0 text-on-surface">Modify or Delete Account</Header>
-	<Text lg class="ml-4 opacity-80 sm:ml-0 text-on-surface">Reset your email/password or delete your account all right here!</Text>
-	<Flex col fill class="bg-surface-variant mt-2 box-border rounded-t-2xl p-6">
-		<Flex row fill>
+<Flex col fill class="mt-8">
+	<Flex class="sticky mr-4 h-16 justify-end">
+		<LightDark />
+	</Flex>
+	<Header bold class="text-on-surface ml-4 !text-3xl sm:ml-0">Modify or Delete Account</Header>
+	<Text lg class="text-on-surface ml-4 opacity-80 sm:ml-0">Reset your email/password or delete your account all right here!</Text>
+	<Flex col surfaceVariant class="mt-2 box-border rounded-t-2xl p-6">
+		<Flex fill>
 			{#if !showSecondForm}
 				<form method="POST" action="?/modifyDelete" autocomplete="off" class="box-border flex size-full flex-col" use:formEnhance>
 					<Text class="text-secondary !text-[14px]">Action</Text>
 					<Dropdown.Menu class="mb-4">
 						<Dropdown.Trigger>
-							<Button class="bg-secondary text-on-secondary cursor-pointer block px-4 py-2 text-sm w-full text-left" form="">{$form.type || 'Select an Option'}</Button>
+							<Button class="bg-secondary text-on-secondary block w-full cursor-pointer rounded-xl px-4 py-2 text-left text-sm" form=""
+								>{$form.type || 'Select an Option'}</Button
+							>
 						</Dropdown.Trigger>
 						<Dropdown.Content>
 							<Dropdown.Button
@@ -85,15 +91,20 @@
 
 					<Button class="bg-seed mb-4 h-12 w-full cursor-pointer rounded-xl text-white">Continue</Button>
 
-					<Flex row center class="gap-2">
+					<Flex center class="gap-2">
 						<a href="/" class="text-primary font-bold underline">Back to home</a>
 					</Flex>
 				</form>
 			{/if}
 
 			{#if showSecondForm && !codeForm?.go_back_btn}
-				<form method="POST" action="?/code" class="box-border flex size-full flex-col gap-4 text-on-surface" use:enhance>
-					<Text bold class="text-center">Verify Code</Text>
+				<form method="POST" action="?/code" class="text-on-surface box-border flex size-full flex-col gap-4" use:enhance>
+				<Flex centerx class="relative">
+					<Button href="/" class="flex cursor-pointer rounded-full bg-red-700 p-3">
+						<Back class="size-6" />
+					</Button>
+					<Text bold class="absolute left-1/2 -translate-x-1/2 transform text-center">Verify Code</Text>
+				</Flex>
 					<Text class="text-center text-sm">
 						We just emailed a verification code to {whichEmail}. Please check your inbox. If you don’t see it, check your spam folder. The code
 						expires in 10 minutes. If it expires, you will need to refresh the page and start the registration process again.
@@ -107,7 +118,9 @@
 			{/if}
 
 			{#if codeForm?.go_back_btn}
+			<Frame center>
 				<Error big error={codeForm?.error} onclick={() => goto('/')} btnText="Back to Home" class="" />
+			</Frame>
 			{/if}
 
 			<Frame class="mt-[8%] hidden lg:ml-4 lg:block lg:w-full">

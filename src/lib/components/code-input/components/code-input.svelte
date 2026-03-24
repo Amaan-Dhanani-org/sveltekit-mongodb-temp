@@ -144,7 +144,7 @@
 	}
 </script>
 
-<Flex row class={wrapperCls}>
+<Flex class={wrapperCls}>
 	{#each values as _, idx}
 		<Frame class={containerCls}>
 			<input
@@ -194,7 +194,7 @@
 
 	### Functional Props:
 	- `name`: Identifier for the component (e.g., useful when used in forms or labeled contexts).
-	- `length`:  Number of input boxes to render. The default is 6.
+	- `length`: Number of input boxes to render. The default is 6.
 	- `placeholder`: Placeholder text shown inside each input box.
 
     @rendered

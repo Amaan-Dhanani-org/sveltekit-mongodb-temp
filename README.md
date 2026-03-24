@@ -53,7 +53,7 @@ If you are using a color/properties too much and you want to organize them, espe
 }
 ```
 
-Theme rendering can be seen in the `+layout.svelte` of the project!
+Theme rendering can be seen in the `+layout.svelte` of the project! It uses `npm` package `sk-clib` by GitHub user `TreltaSev`!
 </details>
 
 <details>

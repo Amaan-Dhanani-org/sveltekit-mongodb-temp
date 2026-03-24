@@ -50,7 +50,6 @@ export async function sendEmail({ to, subject, textTpl, htmlTpl, data = {} }: Se
         
         return null;
     } catch (err: any) {
-        console.error('Nodemailer Error:', err);
         return err instanceof Error ? err.message : String(err);
     }
 }

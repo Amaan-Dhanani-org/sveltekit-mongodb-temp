@@ -9,7 +9,7 @@
 		children,
 		class: className,
 		inputClass = $bindable(
-			'bg-secondary truncate text-on-secondary outline box-border rounded-3 px-3 py-4 w-full text-[14px] rounded-[12px] px-4 py-3'
+			'bg-secondary truncate text-on-secondary box-border rounded-3 px-3 py-4 w-full text-[14px] rounded-[12px] px-4 py-3'
 		),
 		labelClass = $bindable('text-secondary text-[14px]'),
 		classLabel = $bindable(''),

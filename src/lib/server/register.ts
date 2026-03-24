@@ -1,6 +1,5 @@
 import bcrypt from "bcrypt";
 import { generate_code_and_ttl, sendEmail } from "./utils";
-import path from 'node:path';
 import type { Cookies } from "@sveltejs/kit";
 import { User_Model } from "./models";
 import jwt from "jsonwebtoken";
@@ -90,7 +89,7 @@ export async function create_user(
 		});
 
 		if (error) {
-			return  { error}
+			return { error };
 		}
 
 		// Setting a cookie with JWT token to transfer email between actions. Server use only.
@@ -126,6 +125,10 @@ export async function verify_user(
 	const user = await User_Model.findOne({ email });
 	if (!user) return { error: "Your code probably expired. Please try registering again.", go_back_btn: true };
 	if (!user.code) return { error: "This account is already verified. Try logging in instead.", go_back_btn: true };
+
+	if (code.length != 6) {
+		return { error: "Your code must be six characters.", go_back_btn: false };
+	}
 
 	if (user.code !== code) {
 		// increment attempts

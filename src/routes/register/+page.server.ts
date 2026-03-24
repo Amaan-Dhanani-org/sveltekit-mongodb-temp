@@ -13,7 +13,7 @@ export const load: PageServerLoad = async () => {
 }
 
 export const actions = {
-	register: async (event) => {
+	register: async (event: any) => {
 		const form = await superValidate(event, zod4(registerSchema));
 
 		if (!form.valid) {
@@ -28,11 +28,11 @@ export const actions = {
 			return fail(400, { form });
 		}
 
-		//Returning result to render email in frontend.
+		// Returning result to render email in frontend.
 		return { form };
 	},
 
-	code: async (event) => {
+	code: async (event: any) => {
         const code = (await event.request.formData()).get("code") as string;
         const { error, go_back_btn } = await verify_user(code, event.cookies);
 
@@ -40,7 +40,7 @@ export const actions = {
             return { error, go_back_btn };
         }
 
-        throw redirect(303, "/login");
+        throw redirect(307, "/login");
 	}
 
 

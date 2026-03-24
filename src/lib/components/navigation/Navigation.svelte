@@ -1,12 +1,21 @@
 <script lang="ts">
-	import { Flex, Frame } from "sk-clib";
-	let { children } = $props();
+	import { Flex, Frame, Button, Text } from "sk-clib";
+	import { type Component } from "svelte";
+	import IconSettings from '~icons/ic/baseline-settings';
 </script>
 
-<Frame class="fixed right-0 bottom-0 left-0 z-10 w-full">
-	<Flex row class="h-[118px] w-full items-end justify-around">
-		<!-- svelte-ignore element_invalid_self_closing_tag -->
-		<div class="absolute -z-100 h-[95px] w-full rounded-t-[30px] bg-outline" />
-		{@render children()}
+{#snippet widgetButton(text: string, Icon: Component, href?: string)}
+	<Flex col class="mb-2 gap-1 items-center">
+		<Button href={href} class="cursor-pointer rounded-full bg-(--color-seed)/80 p-3 hover:bg-(--color-seed)/100">
+			<Icon class="text-white size-6" />
+		</Button>
+		<Text class="select-none" lg>{text}</Text>
 	</Flex>
-</Frame>
+{/snippet}
+
+<Flex fillw outline class="fixed right-0 bottom-0 left-0 z-10 h-24 rounded-t-4xl items-end justify-around">
+	{@render widgetButton('Option', IconSettings)}
+	{@render widgetButton('Option', IconSettings)}
+	{@render widgetButton('Option', IconSettings)}
+	{@render widgetButton('Settings', IconSettings, '/settings')}
+</Flex>

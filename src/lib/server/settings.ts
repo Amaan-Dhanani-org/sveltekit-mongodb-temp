@@ -1,42 +1,19 @@
-import type { Cookies } from "@sveltejs/kit";
+
 import { User_Model } from "./models";
 import { authenticate } from "./authenticate";
-import { verify_name, verify_email } from "./register";
+import type { Cookies } from "@sveltejs/kit";
 
-export async function change_name(
-	cookies: Cookies,
-	name: string
-): Promise<{ error: string } | { name: string }> {
-	const auth = authenticate(cookies);
+export async function returnName(cookies: Cookies) {
+    const id = authenticate(cookies);
+    const user = await User_Model.findById(id);
+    return user?.name;
+}
 
-	if (!auth) {
-		return { error: "You are not authorized." };
-	}
-
-	const { id } = auth;
-
-	const name_error = verify_name(name);
-
-	if (name_error) {
-		return { error: name_error };
-	}
-
-	const user = await User_Model.findOne({ _id: id });
-
-	if (!user) {
-		return { error: "User could not be found" };
-	}
-
-	if (user.name === name) {
-		return { error: "You already have this name." };
-	}
-
-	user.name = name;
-
-	try {
-		await user.save();
-		return { name };
-	} catch (err) {
-		return { error: err?.toString() as string };
-	}
+export async function updateName(newName: string | undefined, cookies: Cookies) {
+    const id = authenticate(cookies);
+    const user = await User_Model.findById(id);
+    if (!user) return "You are an invalid user or are not authenicated. Try logging in again, maybe?";
+    if (!newName) return "You are missing data.";
+    if (user.name === newName) return "Your new name must be different from the current name.";
+    await User_Model.updateOne({ _id: id }, { name: newName });
 }

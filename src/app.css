@@ -1,25 +1,5 @@
-
-
 @import 'tailwindcss';
 @import './theme.css';
-
-@theme {
-	--font-poppins: 'Poppins', sans-serif;
-
-/*	=== COLORS ===
-//	--color-backdrop: #1f1f39;
-//	--color-backdrop: #1f1f39;
-//	--color-backdrop-light: #f0f0f2;
-//	--color-primary: #3d5cff;			/*blue - usually button color*/
-/*	--color-secondary: #2f2f42;			/*dark gray - usually form background color*/
-/*	--color-subheading: #b8d8d2;		/*gray-purple - subheading color
-
-
-
-	/* Semantic Colors */
-	--color-green: #52ff72;
-	--color-red: #ff6052;	
-}
 
 @layer base {
 	html, body { 

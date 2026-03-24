@@ -5,15 +5,20 @@ import { fail, redirect } from "@sveltejs/kit";
 import { loginSchema } from "$lib/validation";
 import { login_user } from "$lib/server/login";
 import { setError } from "sveltekit-superforms/server";
-import { cookie_options } from "$lib/server/utils";
+import { User_Model } from '$lib/server/models';
+import { authenticate } from "$lib/server/authenticate";
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async ({ cookies }) => {
+    const id = authenticate(cookies);
+    const user = await User_Model.findById(id);
+    if (user) throw redirect(307, "/dashboard");
+
     const form = await superValidate(zod4(loginSchema));
     return { form };
 }
 
 export const actions = {
-    default: async (event) => {
+    default: async (event: any) => {
         const form = await superValidate(event, zod4(loginSchema));
 
         if (!form.valid) {
@@ -28,6 +33,6 @@ export const actions = {
 			return fail(400, { form });
 		}
 
-        throw redirect(303, "/dashboard");
+        throw redirect(307, "/dashboard");
     }
 };

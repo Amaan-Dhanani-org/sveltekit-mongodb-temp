@@ -37,7 +37,7 @@
 
 <Button class={ buttonCls } {...rest} onclick={(e) => {
     onclick?.(e);
-    toggle();    
+    toggle();
 }} form="">
     {@render children?.()}
 </Button>

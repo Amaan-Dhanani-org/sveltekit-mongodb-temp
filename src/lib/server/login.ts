@@ -16,9 +16,7 @@ export async function login_user(
 		return { error: "A user with that email does not exist." };
 	}
 
-	if (dbUser.verified === false) {
-		return { error: "Account is unverified. Try registering instead." };
-	}
+	if (!dbUser.verified) { return { error: "Account is unverified. Try registering instead." } };
 
 	const password_is_correct = await bcrypt.compare(password, dbUser.password);
 	if (!password_is_correct) {

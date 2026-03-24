@@ -1,6 +1,5 @@
 import bcrypt from "bcrypt";
 import { generate_code_and_ttl, sendEmail } from "./utils";
-import { read } from '$app/server';
 import type { Cookies } from "@sveltejs/kit";
 import { ChangeCreds_Model, User_Model } from "./models";
 import jwt from "jsonwebtoken";
@@ -58,6 +57,7 @@ export async function create_request(
     // 1. Check if user exists
     const user = await User_Model.findOne({ email });
     if (!user) return { error: 'A user with that email does not exist.' };
+    if (!user.verified) return { error: "Account is unverified. Try registering instead." };
 
     // 2. Clear old requests for this user
     await ChangeCreds_Model.deleteOne({ email });
@@ -122,7 +122,7 @@ export async function create_request(
         const recipient = type === 'Change Email' ? (newEmail ?? '') : email;
 
         const error = await sendEmail({
-            to: email,
+            to: recipient,
             subject: 'Hello, here is your verification code',
             textTpl: textTemplate,
             htmlTpl: htmlTemplate,
@@ -165,6 +165,10 @@ export async function verify_request(
     const request = await ChangeCreds_Model.findOne({ email });
     if (!request) return { error: "Your code probably expired. Please try again.", go_back_btn: true };
 
+    if (code.length != 6) {
+		return { error: "Your code must be six characters.", go_back_btn: false };
+	}
+
     if (request.code !== code) {
         // increment attempts
         const attempts = (request.attempts || 0) + 1;
@@ -195,5 +199,5 @@ export async function verify_request(
     }
 
     await ChangeCreds_Model.deleteOne({ _id: request._id });
-    throw redirect(303, '/logout');
+    throw redirect(307, '/logout');
 }
