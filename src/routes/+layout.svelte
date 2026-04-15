@@ -1,28 +1,38 @@
 <script lang="ts">
+	import { page } from '$app/state';
+	import { goto } from '$app/navigation';
+	import { getCookie } from '$lib/utils';
+
+	const protected_routes = ['/dashboard', '/logout'];
+
+	$effect(() => {
+		(async () => {
+			const pathname = page.url.pathname;
+			const token = await getCookie('auth-token');
+
+			const res = (await fetch('/api/load', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ token })
+			}))
+
+			const { auth } = await res.json();
+
+			if (auth && pathname === '/login') {
+				goto('/dashboard');
+			}
+
+			if (!auth && protected_routes.includes(pathname)) {
+				goto('/notauth');
+				return;
+			}
+		})();
+	});
+
 	import '../app.css';
 	import { Flex } from 'sk-clib';
 	import { ThemeInit } from 'sk-clib/theme';
 	let { children } = $props();
-	import { getCookie } from '$lib/utils';
-	import { onMount } from 'svelte';
-	import { goto } from '$app/navigation';
-
-	onMount(async () => {
-		const id = getCookie('auth-token');
-
-		const result = await fetch('/api/auth', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ token: id }),
-		});
-
-		const data = await result.json();
-
-		if (!data.valid) {
-			goto("/logout");
-		}
-
-	});
 </script>
 
 <ThemeInit defaults={{ defaultSeedColor: '#3d5cff', defaultMode: 'dark', defaultVariant: 'vibrant' }} />

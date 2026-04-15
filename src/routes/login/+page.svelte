@@ -1,19 +1,35 @@
 <script lang="ts">
-	// === Components ===
 	import { Input, Error, LightDark } from '$lib/components';
 	import { Flex, Frame, Button, Header, Text } from 'sk-clib';
 	import Logo from '$lib/images/Logo.png';
+	import { setCookie } from '$lib/utils';
+	import { goto } from '$app/navigation';
 
-	import { superForm } from 'sveltekit-superforms/client';
-	import type { PageData } from './$types';
-	import { loginSchema } from '$lib/validation';
-	import { zod4 } from 'sveltekit-superforms/adapters';
+	let form_el: HTMLFormElement;
+	let emailError = $state('');
+	let passwordError = $state('');
 
-	let { data }: { data: PageData } = $props();
+	async function onsubmit(event: Event) {
+		event.preventDefault();	// no refresh
 
-	const { form, enhance, errors } = superForm(data?.form, {
-		validators: zod4(loginSchema)
-	});
+		const response = await fetch('/api/login', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(Object.fromEntries(new FormData(form_el)) as any)
+		});
+
+		const { emailError: eErr, passwordError: pErr, token } = await response.json();
+
+		if (response.status == 200) {
+			await setCookie("auth-token", token);
+			goto("/dashboard");
+		}
+		else if (response.status == 400) {
+			emailError = passwordError = ""; // reset state so previous errors can appear again
+			emailError = eErr;
+			passwordError = pErr;
+		}
+	}
 </script>
 
 <Flex col fill class="mt-8">
@@ -24,9 +40,9 @@
 	<Text lg class="text-on-surface ml-4 opacity-80 sm:ml-0">Welcome Back!</Text>
 	<Flex col fill surfaceVariant class="mt-2 box-border rounded-t-2xl p-6">
 		<Flex fill>
-			<form method="POST" autocomplete="off" use:enhance class="box-border flex w-full flex-col">
-				<Input type="text" class="mb-4" name="email" label="Email" bind:value={$form.email} />
-				<Input type="password" class="mb-7" label="Password" name="password" bind:value={$form.password} />
+			<form class="box-border flex w-full flex-col" bind:this={form_el} {onsubmit}>
+				<Input type="text" class="mb-4" name="email" label="Email" />
+				<Input type="password" class="mb-7" label="Password" name="password" />
 
 				<Button class="bg-seed mb-4 h-12 w-full cursor-pointer rounded-xl text-white">Sign In</Button>
 
@@ -45,8 +61,8 @@
 			</Frame>
 		</Flex>
 
-		<Error duration={3000} error={$errors.email} />
-		<Error duration={3000} error={$errors.password} />
+		<Error duration={3000} error={emailError} />
+		<Error duration={3000} error={passwordError} />
 		<img src={Logo} alt="Logo" class="block w-full object-contain lg:hidden" />
 	</Flex>
 </Flex>

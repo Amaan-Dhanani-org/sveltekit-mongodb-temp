@@ -7,7 +7,8 @@
 
 	let { error = $bindable(), big, onclick, btnText, duration, divClass = $bindable('w-full'), class: className }: Props = $props();
 
-	let divCls = $state(cn(divClass, className));
+	// svelte-ignore state_referenced_locally
+		let divCls = $state(cn(divClass, className));
 
 	$effect(() => {
 		divCls = cn(divClass, className);
@@ -27,9 +28,8 @@
 
 {#if error}
 	<!-- transition:fade makes it disappear smoothly -->
-	<div transition:fade={{ duration: 500 }}>
+	<div transition:fade={{ duration: 500 }} class={divCls}>
 		{#if big}
-			<Frame class={divCls}>
 				<Frame class="mx-auto w-full max-w-[290px] overflow-hidden rounded-lg bg-white shadow-lg">
 					<Frame class="p-5 text-center">
 						<Frame class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
@@ -44,7 +44,6 @@
 						{/if}
 					</Frame>
 				</Frame>
-			</Frame>
 		{:else}
 			<Flex center class="relative gap-2 rounded-lg border border-red-400 bg-red-100 px-2 py-1 text-[12px] text-red-700">
 				<RoundError class="inline h-[16px] w-[16px]" />

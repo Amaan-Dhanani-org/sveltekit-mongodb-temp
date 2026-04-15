@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Flex, Header, Text, Button } from "sk-clib";
+	import { Flex, Text, Button } from "sk-clib";
 	import { onMount } from "svelte";
 	import { getCookie } from "$lib/utils";
 	import { theme } from "sk-clib/theme";
@@ -11,9 +11,9 @@
 
 	let colors = $state<ColorPair[]>([]);
 
-	onMount(() => {
+	onMount(async() => {
 		// Get md theme from cookies
-		const md_theme_json: string | undefined = getCookie("md-theme");
+		const md_theme_json: string | undefined = await getCookie("md-theme");
 		if (!md_theme_json) throw new Error("Failed to read md_theme from cookies");
 
 		// Convert the json into a object we can use
@@ -47,7 +47,7 @@
 		theme.seedColor = (event.target as HTMLInputElement).value;
 	}
 
-	function reset_colors(event: Event) {
+	function reset_colors() {
 		theme.mode = "dark";
 		theme.variant = "vibrant";
 		theme.seedColor = "#3d5cff";

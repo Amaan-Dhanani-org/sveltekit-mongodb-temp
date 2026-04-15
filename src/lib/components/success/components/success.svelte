@@ -15,7 +15,8 @@
 		class: className 
 	}: Props = $props();
 
-	let divCls = $state(cn(divClass, className));
+	// svelte-ignore state_referenced_locally
+		let divCls = $state(cn(divClass, className));
 	
 	$effect(() => {
 		divCls = cn(divClass, className);
@@ -35,9 +36,8 @@
 
 {#if success}
 	<!-- transition:fade makes it disappear smoothly -->
-	<div transition:fade={{ duration: 500 }}>
+	<div transition:fade={{ duration: 500 }} class={divCls}>
 		{#if big}
-			<Frame class={divCls}>
 				<Frame class="w-full mx-auto max-w-[290px] overflow-hidden rounded-lg bg-white shadow-lg">
 					<Frame class="p-5 text-center">
 						<Frame class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-teal-100">
@@ -52,7 +52,6 @@
 						{/if}
 					</Frame>
 				</Frame>
-			</Frame>
 		{:else}
 			<Flex center class="relative gap-2 rounded-lg border border-teal-400 bg-teal-100 px-2 py-1 text-[12px] text-teal-700">
 				<RoundSuccess class="inline h-[16px] w-[16px]" />
