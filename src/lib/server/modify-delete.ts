@@ -2,8 +2,6 @@ import bcrypt from "bcrypt";
 import { generate_code_and_ttl, sendEmail } from "./utils";
 import type { Cookies } from "@sveltejs/kit";
 import { ChangeCreds_Model, User_Model } from "./models";
-import jwt from "jsonwebtoken";
-import { SECRET_JWT_KEY } from "$env/static/private";
 import { deleteUser } from "./deleteUser";
 import { redirect } from "@sveltejs/kit";
 
@@ -82,7 +80,7 @@ export async function create_request(
         password = hashedPassword;
     }
     else if (type === 'Change Email') {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const emailRegex = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/;
         if (!newEmail || !emailRegex.test(newEmail)) return { error: 'Please enter a valid email.' };
 
         // Run DB lookup and Bcrypt compare at the same time
@@ -133,17 +131,6 @@ export async function create_request(
             return { error }
         }
 
-        cookies.set(
-            "verify_email",
-            jwt.sign({ email }, SECRET_JWT_KEY),
-            {
-                httpOnly: true,
-                secure: true,
-                sameSite: "strict",
-                path: "/",
-            }
-        );
-
         return { error: "" };
     } catch (err) {
         return { error: err?.toString() as string };
@@ -155,12 +142,6 @@ export async function verify_request(
     cookies: Cookies
 ): Promise<{ error: string, go_back_btn: boolean }> {
     let email: string;
-    try {
-        email = (jwt.verify(cookies.get("verify_email")!, SECRET_JWT_KEY) as { email: string }).email;
-    } catch (err) {
-        // tampered token, expired, or missing
-        return { error: "Cookies are required to complete registration because we use them to securely verify your email. Please make sure cookies are enabled in your browser settings and register again. If you're using a browser extension or privacy mode that blocks cookies, temporarily disable it for this site.", go_back_btn: true };
-    }
 
     const request = await ChangeCreds_Model.findOne({ email });
     if (!request) return { error: "Your code probably expired. Please try again.", go_back_btn: true };

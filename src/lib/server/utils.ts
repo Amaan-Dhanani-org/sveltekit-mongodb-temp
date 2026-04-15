@@ -1,13 +1,6 @@
 import nodemailer from 'nodemailer';
 import { EMAIL_SMTP_PASS, EMAIL_SMTP_USER } from '$env/static/private';
 
-export const cookie_options = {
-    httpOnly: true,
-    secure: true,
-    path: "/",
-    maxAge: 86400,
-} as const;
-
 export function generate_code_and_ttl(): { code: number; ttl: Date } {
     const digits = 6;
     const time = 10; //minutes

@@ -1,4 +1,4 @@
-<script lang="ts">
+<!-- <script lang="ts">
 	import { Frame, Flex, Button, Header, Text } from 'sk-clib';
 	import { Error, Input, Success, LightDark, Navigation } from '$lib/components';
 	import Logo from '$lib/images/Logo.png';
@@ -37,4 +37,4 @@
 		</Frame>
 		<Navigation />
 	</Flex>
-</Flex>
+</Flex> -->
