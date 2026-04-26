@@ -2,7 +2,7 @@ import type { RequestHandler } from './$types';
 import bcrypt from 'bcrypt';
 import { User_Model } from '$lib/server/models';
 import { sendEmail } from '$lib/server/utils';
-import { generate_code_and_ttl } from '$lib/server/utils';
+import { generate_code_and_ttl, getPwdReqsErr } from '$lib/server/utils';
 
 
 const textTemplate = `
@@ -58,21 +58,7 @@ export const POST: RequestHandler = async ({ request }) => {
 	}
 
 	// ===== PASSWORD VALIDATION =====
-	const issues: string[] = [];
-
-	if (!password || password.length < 8) issues.push('at least 8 characters');
-	if (!/[A-Z]/.test(password)) issues.push('an uppercase letter');
-	if (!/[a-z]/.test(password)) issues.push('a lowercase letter');
-	if (!/\d/.test(password)) issues.push('a number');
-	if (!/[\W_]/.test(password)) issues.push('a special character');
-
-	if (issues.length > 0) {
-		const formatter = new Intl.ListFormat('en', {
-			style: 'long',
-			type: 'conjunction'
-		});
-		passwordError = `Your password needs ${formatter.format(issues)}.`;
-	}
+	passwordError = getPwdReqsErr(password);
 
 	// ===== TYPE VALIDATION =====
 	const allowedTypes = ['Account Type 1', 'Account Type 2'];

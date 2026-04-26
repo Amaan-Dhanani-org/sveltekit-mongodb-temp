@@ -85,6 +85,7 @@
 					<Text class="text-secondary !text-[14px]">Type</Text>
 					<Dropdown.Menu class="mb-4">
 						<Dropdown.Trigger>
+							<!--Need to have empty form attrbiute so the "button" isn't a "submit button"-->
 							<Button class="bg-secondary text-on-secondary block w-full cursor-pointer rounded-xl px-4 py-2 text-left text-sm" form="">
 								{accountTypeValue}
 							</Button>
@@ -140,7 +141,7 @@
 				<Error big error={codeError} btnText="Back to Home" onclick={()=>goto('/')} />
 			{/if}
 
-			{#if formStep == 3 }
+			{#if formStep == 3}
 				<Success big success="You've been successfully registered." btnText="Continue to Login" onclick={()=>goto('/login')} />
 			{/if}
 			<Frame class="mt-[8%] hidden lg:ml-4 lg:block lg:w-full">

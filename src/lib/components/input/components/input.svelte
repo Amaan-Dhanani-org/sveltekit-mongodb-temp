@@ -41,7 +41,7 @@
 
 {#if type === 'password'}
 	<div class={cn(inputCls, 'relative p-0')}>
-		<input id={inputId} class="w-full px-4 py-3 outline-none" bind:value type={showPassword ? 'text' : 'password'} {...rest} />
+		<input id={inputId} class="w-full pl-4 pr-8 py-3 outline-none" bind:value type={showPassword ? 'text' : 'password'} {...rest} />
 
 		<button
 			type="button"

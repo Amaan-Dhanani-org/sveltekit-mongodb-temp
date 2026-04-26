@@ -1,8 +1,8 @@
-import type { RequestHandler } from './$types';
-import bcrypt from 'bcrypt';
-import { User_Model } from '$lib/server/models';
-import { sendEmail } from '$lib/server/utils';
-import { generate_code_and_ttl } from '$lib/server/utils';
+import bcrypt from "bcrypt";
+import { generate_code_and_ttl, sendEmail, getPwdReqsErr } from "$lib/server/utils";
+import { ChangeCreds_Model, User_Model } from "$lib/server/models";
+import type { RequestHandler } from "./$types";
+
 
 const textTemplate = `
 Use the code below to complete your request:
@@ -43,21 +43,113 @@ const htmlTemplate = `
 `
 
 export const POST: RequestHandler = async ({ request }) => {
-    const { type, email: rawEmail, password, newEmail: rawNewEmail } = await request.json();
+	const { email, newEmail, type, password } = await request.json();
 
-   let emailError = '';
-   let passwordError = '';
-   let typeError = '';
+	let emailError = "";
+	let newEmailError = "";
+	let typeError = "";
+	let passwordError = "";
 
-   const email = rawEmail?.trim().toLowerCase();
-   const newEmail = rawNewEmail?.trim().toLowerCase();
+	const user = await User_Model.findOne({ email });
 
-   const emailRegex = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/;
+	if (!user) {
+		emailError = "A user with that email does not exist.";
+	} else if (!user.verified) {
+		emailError = "Account is unverified. Try registering instead.";
+	}
+	if (!password) {
+		passwordError = "Password cannot be empty.";
+	}
 
-   if (!emailRegex.test(email)) {
-        emailError = 'Please enter a valid email address.';
-   }
+	await ChangeCreds_Model.deleteOne({ email });
 
-   if (!emailRegex.test(newEmail)) {
-        emailError = 'Please enter a valid new email address.';
-   }
+	let finalPassword = password;
+
+	if (user) {
+		if (type === "Change Password") {
+			passwordError = getPwdReqsErr(password);
+
+			const [same, hashed] = await Promise.all([
+				bcrypt.compare(password, user.password),
+				bcrypt.hash(password, 12)
+			]);
+
+			if (same) {
+				passwordError = "You can't reuse your current password.";
+			} else {
+				finalPassword = hashed;
+			}
+
+		}
+
+		else if (type === "Change Email") {
+			const emailRegex = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/;
+
+			if (!newEmail || !emailRegex.test(newEmail)) {
+				newEmailError = "Please enter a valid new email.";
+			} else {
+				const [passwordCorrect, emailTaken] = await Promise.all([
+					bcrypt.compare(password, user.password),
+					User_Model.findOne({ email: newEmail })
+				]);
+
+				if (!passwordCorrect) {
+					passwordError = "Password is not correct.";
+				}
+
+				if (emailTaken) {
+					newEmailError = "This email is already in use by an account.";
+				}
+
+				finalPassword = "";
+			}
+		}
+
+		else if (type === "Delete Account") {
+			const ok = await bcrypt.compare(password, user.password);
+
+			if (!ok) {
+				passwordError = "Password is not correct.";
+			}
+		}
+
+		else {
+			typeError = "Invalid request type.";
+		}
+	}
+
+	const hasError = () => emailError || passwordError || typeError || newEmailError;
+	// reuse SAME return
+	if (hasError()) {
+		return new Response(JSON.stringify({ emailError, passwordError, typeError, newEmailError }), {
+			status: 400
+		});
+	}
+
+	const { code, ttl } = generate_code_and_ttl();
+
+	const requestDoc = new ChangeCreds_Model({
+		email,
+		newEmail,
+		type,
+		password: finalPassword,
+		code: code.toString(),
+		ttl,
+		attempts: 0
+	});
+
+	await requestDoc.save();
+
+	const recipient = type === "Change Email" ? (newEmail ?? "") : email;
+
+	sendEmail({
+		to: recipient,
+		subject: 'Hello, here is your verification code',
+		textTpl: textTemplate,
+		htmlTpl: htmlTemplate,
+		data: { code: code.toString() }
+	});
+
+	// SINGLE RETURN ONLY
+	return new Response(JSON.stringify({ email, newEmail }));
+};
