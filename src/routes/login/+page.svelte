@@ -10,7 +10,7 @@
 	let passwordError = $state('');
 
 	async function onsubmit(event: Event) {
-		event.preventDefault();	// no refresh
+		event.preventDefault(); // no refresh
 
 		const response = await fetch('/api/login', {
 			method: 'POST',
@@ -18,26 +18,25 @@
 			body: JSON.stringify(Object.fromEntries(new FormData(form_el)) as any)
 		});
 
-		const { emailError: eErr, passwordError: pErr, token } = await response.json();
+		const data = await response.json();
 
-		if (response.status == 200) {
-			await setCookie("auth-token", token);
-			goto("/dashboard");
-		}
-		else if (response.status == 400) {
+		if (response.ok) {
+			await setCookie('auth-token', data.token, 7);
+			goto('/dashboard');
+		} else {
 			emailError = passwordError = ""; // reset state so previous errors can appear again
-			emailError = eErr;
-			passwordError = pErr;
+			emailError = data.emailError;
+			passwordError = data.passwordError;
 		}
 	}
 </script>
 
 <Flex col fill class="mt-8">
-	<Flex class="sticky mr-4 justify-end">
+	<Flex class="sticky mr-4 h-16 justify-end">
 		<LightDark />
 	</Flex>
 	<Header bold class="text-on-surface ml-4 !text-3xl sm:ml-0">Sign In</Header>
-	<Text lg class="text-on-surface ml-4 opacity-80 sm:ml-0">Welcome Back!</Text>
+	<Text lg class="text-on-surface ml-4 opacity-80 sm:ml-0">One quick sign in and you're in.</Text>
 	<Flex col fill surfaceVariant class="mt-2 box-border rounded-t-2xl p-6">
 		<Flex fill>
 			<form class="box-border flex w-full flex-col" bind:this={form_el} {onsubmit}>
@@ -50,9 +49,9 @@
 					<Text lg class="text-inverse-surface">Don't have an account?</Text>
 					<a href="/register" class="text-primary font-bold underline">Sign Up</a>
 				</Flex>
-				<Flex center class="gap-2">
-					<Text lg class="text-on-surface">Wanna delete or modify your account?</Text>
-					<a href="/modify-delete" class="text-primary font-bold underline">Click here</a>
+				<Flex center class="gap-1">
+					<Text lg class="text-on-surface">Delete or modify your account</Text>
+					<a href="/modify-delete" class="text-primary text-sm font-bold underline">here</a>
 				</Flex>
 			</form>
 

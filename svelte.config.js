@@ -1,8 +1,12 @@
 import adapter from '@sveltejs/adapter-vercel'
 
+
+//TODO: (rm, if) > runtime, not using vercel
 const config = {
   kit: {
-    adapter: adapter(),
+    adapter: adapter({
+			runtime: 'nodejs22.x'
+		}),
   },
 }
 

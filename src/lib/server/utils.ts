@@ -109,17 +109,3 @@ export function getPwdReqsErr(password: string): string {
 
     return `Your password needs ${formatter.format(issues)}.`;
 }
-
-/**
- * Deletes a user and all associated data linked to the given email.
- *
- * @param email - The email address of the user to be deleted.
- *
- * This operation is permanent and removes all related records tied to the user.
- */
-export async function deleteUser(email: string) {
-   await User_Model.deleteOne({ email });
-   await Session_Model.deleteOne({ email });
-
-   // Expandable to additional collections as the data model grows.
-}

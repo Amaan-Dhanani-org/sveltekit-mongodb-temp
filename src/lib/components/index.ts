@@ -1,6 +1,6 @@
 export { default as Input } from './input/components/input.svelte';
 export { default as Textarea } from './textarea/components/Textarea.svelte';
-export { default as Navigation } from './navigation/Navigation.svelte';
+export { default as Navigation } from './navigation/components/Navigation.svelte';
 export { default as TextRedactor } from './text-redactor/components/text-redactor.svelte';
 export { default as CodeInput } from './code-input/components/code-input.svelte';
 export { default as Error } from './error/components/error.svelte';

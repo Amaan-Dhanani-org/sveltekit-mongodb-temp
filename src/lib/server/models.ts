@@ -12,9 +12,9 @@ const User_Schema = new mongoose.Schema({
 });
 
 const Session_Schema = new mongoose.Schema({
-	userId: { type: String, required: true, unique: true },
+	userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
 	token: { type: String, required: true, unique: true },
-	ttl: { type: Date, expires: 0, required: true},
+	ttl: { type: Date, expires: 0, required: true },
 });
 
 const ChangeCreds_Schema = new mongoose.Schema({

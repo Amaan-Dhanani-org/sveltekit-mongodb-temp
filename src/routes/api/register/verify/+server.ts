@@ -1,4 +1,4 @@
-import type { RequestHandler } from './$types';
+import { json, type RequestHandler } from '@sveltejs/kit';
 import { User_Model } from '$lib/server/models';
 
 export const POST: RequestHandler = async ({ request }) => {
@@ -6,18 +6,15 @@ export const POST: RequestHandler = async ({ request }) => {
 
     // ===== BASIC VALIDATION =====
     if (!email) {
-        return new Response(
-            JSON.stringify({
-                codeError: 'Something went wrong. Please try again.', go_back_btn: true
-            }), { status: 400 });
+        return json(
+            { codeError: "Something went wrong. Please try again.", go_back_btn: true },
+            { status: 400 }
+        );
     }
 
     if (!code || code.length !== 6) {
-        return new Response(
-            JSON.stringify({
-                codeError: 'Your code must be six characters.',
-                go_back_btn: false
-            }),
+        return json(
+            { codeError: "Your code must be six characters.", go_back_btn: false },
             { status: 400 }
         );
     }
@@ -26,21 +23,15 @@ export const POST: RequestHandler = async ({ request }) => {
     const user = await User_Model.findOne({ email });
 
     if (!user) {
-        return new Response(
-            JSON.stringify({
-                codeError: 'Your code probably expired. Please try registering again.',
-                go_back_btn: true
-            }),
+        return json(
+            { codeError: "Your code probably expired. Please try registering again.", go_back_btn: true },
             { status: 400 }
         );
     }
 
     if (!user.code) {
-        return new Response(
-            JSON.stringify({
-                codeError: 'This account is already verified. Try logging in instead.',
-                go_back_btn: true
-            }),
+        return json(
+            { codeError: "This account is already verified. Try logging in instead.", go_back_btn: true },
             { status: 400 }
         );
     }
@@ -52,11 +43,8 @@ export const POST: RequestHandler = async ({ request }) => {
         if (attempts >= 3) {
             await User_Model.deleteOne({ _id: user._id });
 
-            return new Response(
-                JSON.stringify({
-                    codeError: 'Too many incorrect attempts. Please register again.',
-                    go_back_btn: true
-                }),
+            return json(
+                { codeError: "Too many incorrect attempts. Please register again.", go_back_btn: true },
                 { status: 400 }
             );
         }
@@ -66,12 +54,8 @@ export const POST: RequestHandler = async ({ request }) => {
             { $set: { attempts } }
         );
 
-        return new Response(
-            JSON.stringify({
-                codeError: `Incorrect code. You have ${3 - attempts} attempt${3 - attempts === 1 ? '' : 's'
-                    } left.`,
-                go_back_btn: false
-            }),
+        return json(
+            { codeError: `Incorrect code. You have ${3 - attempts} attempt${3 - attempts === 1 ? "" : "s"} left.`, go_back_btn: false },
             { status: 400 }
         );
     }
@@ -85,10 +69,8 @@ export const POST: RequestHandler = async ({ request }) => {
         }
     );
 
-    return new Response(
-        JSON.stringify({
-            codeError: '',
-            go_back_btn: false
-        })
-    );
+    return json({
+        codeError: "",
+        go_back_btn: false
+    });
 };

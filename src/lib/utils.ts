@@ -31,15 +31,27 @@ export function cn(...inputs: (ClassValue | unknown)[]) {
  *
  * @param {string} key - The name of the cookie
  * @param {string} value - The value to store in the cookie
+ * @param {number} days - Optional number of days until the cookie expires
  * @returns {Promise<void>} Resolves when the cookie is successfully set
  *
  * @example
- * await setCookie("token", "abc123");
+ * await setCookie("token", "abc123", 7);
+ * await setCookie("session", "xyz"); // session cookie
  */
-export async function setCookie(key: string, value: string) {
-	if (browser) {
-		await CapacitorCookies.setCookie({ key, value });
+
+export async function setCookie(key: string, value: string, days?: number) {
+	if (!browser) return;
+	const options: any = {
+		key,
+		value
+	};
+
+	if (typeof days === 'number') {
+		const expiryDate = new Date(Date.now() + days * 864e5);
+		options.expires = expiryDate.toUTCString();
 	}
+
+	await CapacitorCookies.setCookie(options);
 }
 
 /**
@@ -54,10 +66,9 @@ export async function setCookie(key: string, value: string) {
  * const token = await getCookie("token");
  */
 export async function getCookie(key: string) {
-	if (browser) {
-		const result = await CapacitorCookies.getCookies();
-		return result[key];
-	}
+	if (!browser) return;
+	const result = await CapacitorCookies.getCookies();
+	return result[key];
 }
 
 /**

@@ -172,7 +172,7 @@
 		<Error duration={3000} error={newEmailError} />
 		<Error duration={3000} error={typeError} />
 		{#if !go_back_btn}
-			<Error error={codeError} />
+			<Error duration={3000} error={codeError} />
 		{/if}
 
 		<img src={Logo} alt="Logo" class="block w-full object-contain lg:hidden" />

@@ -37,17 +37,17 @@
 			body: JSON.stringify(Object.fromEntries(new FormData(firstForm)) as any)
 		});
 
-		const { emailError: eErr, passwordError: pErr, typeError: tErr, email } = await response.json();
+		const data = await response.json();
 
-		if (response.status == 200) {
+		if (response.ok) {
 			formStep = 2;
-			returnedEmail = email;
-			await setCookie('verify-email', email);
-		} else if (response.status == 400) {
+			returnedEmail = data.email;
+			await setCookie('verify-email', data.email);
+		} else {
 			emailError = passwordError = typeError = ''; // reset state so previous errors can appear again
-			emailError = eErr;
-			passwordError = pErr;
-			typeError = tErr;
+			emailError = data.emailError;
+			passwordError = data.passwordError;
+			typeError = data.typeError;
 		}
 	}
 
@@ -60,14 +60,14 @@
 			body: JSON.stringify(Object.fromEntries(new FormData(secondForm)) as any)
 		});
 
-		const { codeError: cErr, go_back_btn: btn } = await response.json();
+		const data = await response.json();
 
-		if (response.status == 200) {
+		if (response.ok) {
 			formStep = 3;
-		} else if (response.status == 400) {
+		} else {
 			codeError = ''; // reset state so previous errors can appear again
-			codeError = cErr;
-			go_back_btn = btn;
+			codeError = data.codeError;
+			go_back_btn = data.go_back_btn;
 		}
 	}
 </script>
@@ -138,11 +138,11 @@
 			{/if}
 
 			{#if go_back_btn}
-				<Error big error={codeError} btnText="Back to Home" onclick={()=>goto('/')} />
+				<Error big error={codeError} btnText="Back to Home" onclick={() => goto('/')} />
 			{/if}
 
 			{#if formStep == 3}
-				<Success big success="You've been successfully registered." btnText="Continue to Login" onclick={()=>goto('/login')} />
+				<Success big success="You've been successfully registered." btnText="Continue to Login" onclick={() => goto('/login')} />
 			{/if}
 			<Frame class="mt-[8%] hidden lg:ml-4 lg:block lg:w-full">
 				<img src={Logo} alt="Logo" />

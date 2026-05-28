@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import { generate_code_and_ttl, sendEmail, getPwdReqsErr } from "$lib/server/utils";
 import { ChangeCreds_Model, User_Model } from "$lib/server/models";
-import type { RequestHandler } from "./$types";
+import { json, type RequestHandler } from "@sveltejs/kit";
 
 
 const textTemplate = `
@@ -43,12 +43,15 @@ const htmlTemplate = `
 `
 
 export const POST: RequestHandler = async ({ request }) => {
-	const { email, newEmail, type, password } = await request.json();
+	let { email: rawEmail, newEmail: rawNewEmail, type, password } = await request.json();
 
 	let emailError = "";
 	let newEmailError = "";
 	let typeError = "";
 	let passwordError = "";
+
+	const email = rawEmail?.trim().toLowerCase();
+	const newEmail = rawNewEmail?.trim().toLowerCase();
 
 	const user = await User_Model.findOne({ email });
 
@@ -57,6 +60,7 @@ export const POST: RequestHandler = async ({ request }) => {
 	} else if (!user.verified) {
 		emailError = "Account is unverified. Try registering instead.";
 	}
+
 	if (!password) {
 		passwordError = "Password cannot be empty.";
 	}
@@ -111,6 +115,8 @@ export const POST: RequestHandler = async ({ request }) => {
 			if (!ok) {
 				passwordError = "Password is not correct.";
 			}
+
+			password = ''; // avoid saving raw uneeded password
 		}
 
 		else {
@@ -121,9 +127,10 @@ export const POST: RequestHandler = async ({ request }) => {
 	const hasError = () => emailError || passwordError || typeError || newEmailError;
 	// reuse SAME return
 	if (hasError()) {
-		return new Response(JSON.stringify({ emailError, passwordError, typeError, newEmailError }), {
-			status: 400
-		});
+		return json(
+			{ emailError, passwordError, typeError, newEmailError },
+			{ status: 400 }
+		);
 	}
 
 	const { code, ttl } = generate_code_and_ttl();
@@ -151,5 +158,5 @@ export const POST: RequestHandler = async ({ request }) => {
 	});
 
 	// SINGLE RETURN ONLY
-	return new Response(JSON.stringify({ email, newEmail }));
+	return json({ email, newEmail });
 };

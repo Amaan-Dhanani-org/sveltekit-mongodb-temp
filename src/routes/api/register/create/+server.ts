@@ -1,4 +1,4 @@
-import type { RequestHandler } from './$types';
+import { json, type RequestHandler } from '@sveltejs/kit';
 import bcrypt from 'bcrypt';
 import { User_Model } from '$lib/server/models';
 import { sendEmail } from '$lib/server/utils';
@@ -74,14 +74,17 @@ export const POST: RequestHandler = async ({ request }) => {
 	const verifiedExists = await User_Model.findOne({ email, verified: true });
 	if (verifiedExists) {
 		emailError = 'A verified user with that email already exists. Try logging in instead.';
+		passwordError = ''; // the rest of errors don't matter
+		typeError = '';
 	}
 
 	const hasError = () => emailError || passwordError || typeError;
 	// reuse SAME return
 	if (hasError()) {
-		return new Response(JSON.stringify({ emailError, passwordError, typeError }), {
-			status: 400
-		});
+		return json(
+			{ emailError, passwordError, typeError },
+			{ status: 400 }
+		);
 	}
 
 	const [hashed_password, { code, ttl }] = await Promise.all([
@@ -110,5 +113,5 @@ export const POST: RequestHandler = async ({ request }) => {
 		data: { code: code.toString() }
 	});
 
-	return new Response(JSON.stringify({ email }));
+	return json({ email });
 };
