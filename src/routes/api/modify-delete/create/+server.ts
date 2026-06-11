@@ -151,7 +151,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 	const recipient = type === "Change Email" ? (newEmail ?? "") : email;
 
-	sendEmail({
+	await sendEmail({
 		to: recipient,
 		subject: 'Hello, here is your verification code',
 		textTpl: textTemplate,
