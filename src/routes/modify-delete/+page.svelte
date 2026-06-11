@@ -53,7 +53,7 @@
 			formStep = 2;
 			returnedEmail = email;
 			whichEmail = typeValue === "Change Email" ? newEmail : email;
-			whichAction = ({ "Change Email": "changing your email address", "Change Password": "changing your password", "Delete Account": "deleting your account" }[typeValue] ?? "");
+			whichAction = ({ "Change Email": "changing your email address", "Change Password": "changing your password", "Delete Account": "deleting your account, but are so sorry to see you go" }[typeValue] ?? "");
 		}
 
 		if (response.status === 400) {

@@ -43,7 +43,7 @@ const htmlTemplate = `
 `
 
 export const POST: RequestHandler = async ({ request }) => {
-	let { email: rawEmail, newEmail: rawNewEmail, type, password } = await request.json();
+	const { email: rawEmail, newEmail: rawNewEmail, type, password } = await request.json();
 
 	let emailError = "";
 	let newEmailError = "";
@@ -57,8 +57,10 @@ export const POST: RequestHandler = async ({ request }) => {
 
 	if (!user) {
 		emailError = "A user with that email does not exist.";
+		return json( { emailError }, { status: 400 } );
 	} else if (!user.verified) {
 		emailError = "Account is unverified. Try registering instead.";
+		return json( { emailError }, { status: 400 } );
 	}
 
 	if (!password) {
@@ -116,7 +118,7 @@ export const POST: RequestHandler = async ({ request }) => {
 				passwordError = "Password is not correct.";
 			}
 
-			password = ''; // avoid saving raw uneeded password
+			finalPassword = ''; // avoid saving raw uneeded password
 		}
 
 		else {
