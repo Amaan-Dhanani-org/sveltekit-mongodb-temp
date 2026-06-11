@@ -105,13 +105,17 @@ export const POST: RequestHandler = async ({ request }) => {
 
 	await user.save();
 
-	sendEmail({
+	const error = sendEmail({
 		to: email,
 		subject: 'Hello, here is your verification code',
 		textTpl: textTemplate,
 		htmlTpl: htmlTemplate,
 		data: { code: code.toString() }
 	});
+	if (error) {
+            return json({ error });
+    }
 
+	//TODO: Mod
 	return json({ email });
 };
