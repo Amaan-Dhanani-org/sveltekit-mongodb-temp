@@ -59,18 +59,26 @@ export async function sendEmail({
         auth: {
             user: EMAIL_SMTP_USER,
             pass: EMAIL_SMTP_PASS
-        }
+        },
+        connectionTimeout: 10_000,
+        greetingTimeout: 10_000,
+        socketTimeout: 15_000
     });
 
-    try {
-        await transporter.sendMail({
-            from: `"Verification" <${EMAIL_SMTP_USER}>`,
-            to,
-            subject: render(subject),
-            text: render(textTpl),
-            html: render(htmlTpl)
-        });
+    const mailPromise = transporter.sendMail({
+        from: `"Verification" <${EMAIL_SMTP_USER}>`,
+        to,
+        subject: render(subject),
+        text: render(textTpl),
+        html: render(htmlTpl)
+    });
 
+    const timeoutPromise = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("Email sending timed out")), 15_000)
+    );
+
+    try {
+        await Promise.race([mailPromise, timeoutPromise]);
         return null;
     } catch (err: any) {
         return err instanceof Error ? err.message : String(err);
