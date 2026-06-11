@@ -113,7 +113,5 @@ export const POST: RequestHandler = async ({ request }) => {
 		data: { code: code.toString() }
 	});
 
-
-	//TODO: Mod
 	return json({ email });
 };
